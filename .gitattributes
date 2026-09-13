@@ -1,0 +1,11 @@
+# Normalise line endings so the corpus and code behave identically on every
+# platform. Contributors on Windows should not have to think about this.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
