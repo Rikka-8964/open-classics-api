@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>中华经典诗文 · 开放检索</title>
+<meta name="description" content="面向学习者与教育软件的中华经典诗文开放检索 API —— 公版数据，免费开放。">
+<style>
+  :root{
+    --paper:#faf8f4; --paper-2:#ffffff; --ink:#23201c; --ink-2:#6b6357;
+    --ink-3:#9a9285; --line:#e5dfd4; --line-2:#d5cdbe;
+    --accent:#8c5a2b; --accent-soft:#f3ece1; --accent-2:#2f6b52;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+  header{border-bottom:1px solid var(--line);background:var(--paper-2)}
+  .head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:26px 0 20px}
+  h1{font-size:20px;font-weight:600;margin:0;letter-spacing:.02em}
+  .sub{color:var(--ink-2);font-size:13px}
+  .head .spacer{flex:1}
+  .api-link{font-size:13px;color:var(--accent);text-decoration:none;border:1px solid var(--line-2);
+    padding:5px 11px;border-radius:999px;white-space:nowrap}
+  .api-link:hover{background:var(--accent-soft)}
+  .stat-row{display:flex;gap:26px;flex-wrap:wrap;padding:0 0 18px;font-size:12.5px;color:var(--ink-3)}
+  .stat-row b{color:var(--ink);font-weight:600;font-size:14px;margin-right:3px}
+
+  .panel{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin:22px 0}
+  .search-row{display:flex;gap:10px;flex-wrap:wrap}
+  input[type=search],select{
+    font:inherit;color:var(--ink);background:var(--paper);
+    border:1px solid var(--line-2);border-radius:9px;padding:9px 12px;outline:none
+  }
+  input[type=search]{flex:1;min-width:220px}
+  input[type=search]:focus,select:focus{border-color:var(--accent);background:#fff}
+  select{cursor:pointer}
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  button{font:inherit;cursor:pointer;border-radius:9px;border:1px solid var(--line-2);
+    background:var(--paper);color:var(--ink);padding:9px 15px}
+  button:hover{background:var(--accent-soft)}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.primary:hover{filter:brightness(1.08)}
+  .hint{font-size:12.5px;color:var(--ink-3);margin-top:12px}
+
+  .result-bar{display:flex;align-items:center;gap:12px;margin:26px 0 12px;font-size:13px;color:var(--ink-2)}
+  .result-bar .spacer{flex:1}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{font-size:12px;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 10px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px;padding-bottom:8px}
+  .card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 17px;cursor:pointer;transition:border-color .12s,transform .12s;text-align:left;
+    display:block;width:100%;font:inherit;color:inherit}
+  .card:hover{border-color:var(--line-2);transform:translateY(-1px)}
+  .card .t{font-size:16px;font-weight:600;letter-spacing:.01em}
+  .card .a{font-size:12.5px;color:var(--ink-2);margin-top:3px}
+  .card .x{font-family:"Songti SC","SimSun","Noto Serif SC",serif;font-size:14px;color:var(--ink-2);
+    margin-top:11px;line-height:1.85;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .card .tg{margin-top:11px;display:flex;gap:6px;flex-wrap:wrap}
+  .card .tg span{font-size:11.5px;color:var(--ink-3);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+
+  .empty{padding:56px 0;text-align:center;color:var(--ink-3)}
+  .pager{display:flex;gap:10px;align-items:center;justify-content:center;padding:26px 0 40px}
+
+  dialog{border:none;border-radius:16px;padding:0;max-width:620px;width:calc(100% - 40px);
+    background:var(--paper-2);color:var(--ink);box-shadow:0 18px 50px rgba(35,32,28,.18)}
+  dialog::backdrop{background:rgba(35,32,28,.4)}
+  .d-body{padding:26px 28px 24px}
+  .d-top{display:flex;gap:14px;align-items:flex-start}
+  .d-top h2{margin:0;font-size:20px;font-weight:600}
+  .d-top .d-a{font-size:13px;color:var(--ink-2);margin-top:4px}
+  .d-close{margin-left:auto;border:none;background:none;font-size:22px;line-height:1;color:var(--ink-3);padding:2px 6px;cursor:pointer}
+  .d-close:hover{color:var(--ink)}
+  .poem{font-family:"Songti SC","SimSun","Noto Serif SC",serif;font-size:18px;line-height:2.15;
+    margin:20px 0 4px;letter-spacing:.02em}
+  .poem div{white-space:pre-wrap}
+  .note{font-size:13.5px;color:var(--ink-2);background:var(--accent-soft);border-radius:9px;padding:12px 14px;margin-top:16px}
+  .d-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .d-meta span{font-size:12px;color:var(--ink-3);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+  .d-id{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;color:var(--ink-3);margin-top:14px;word-break:break-all}
+  footer{border-top:1px solid var(--line);margin-top:20px;padding:22px 0 40px;font-size:12.5px;color:var(--ink-3)}
+  footer a{color:var(--accent);text-decoration:none}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<h2 class="sr">中华经典诗文开放检索：搜索、按朝代体裁主题筛选、查看全文与注解</h2>
+
+<header>
+  <div class="wrap">
+    <div class="head">
+      <h1>中华经典诗文 · 开放检索</h1>
+      <span class="sub">公版数据 · 免费开放 · 面向学习者</span>
+      <span class="spacer"></span>
+      <a class="api-link" href="/api/openapi.json" target="_blank" rel="noopener">API 文档</a>
+    </div>
+    <div class="stat-row" id="stats"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="panel">
+    <div class="search-row">
+      <input type="search" id="q" placeholder="搜诗句、篇名、作者或主题，例如：明月 / 李白 / 思乡" autocomplete="off">
+      <button class="primary" id="go">检索</button>
+      <button id="lucky">随便来一首</button>
+    </div>
+    <div class="filters">
+      <select id="dynasty"><option value="">全部朝代</option></select>
+      <select id="genre"><option value="">全部体裁</option></select>
+      <select id="author"><option value="">全部作者</option></select>
+      <select id="tag"><option value="">全部主题</option></select>
+      <select id="sort">
+        <option value="relevance">按相关度</option>
+        <option value="dynasty">按朝代</option>
+        <option value="author">按作者</option>
+        <option value="title">按篇名</option>
+      </select>
+    </div>
+    <div class="hint">多个关键词用空格分隔，将同时满足（AND）。数据来自 <code>data/works.json</code>，全部为公有领域作品。</div>
+  </div>
+
+  <div class="result-bar">
+    <span id="count">加载中…</span>
+    <span class="spacer"></span>
+    <div class="chips" id="active"></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="pager" id="pager"></div>
+</main>
+
+<footer class="wrap">
+  <div>
+    <strong>open-classics-api</strong> · MIT License ·
+    数据为公有领域经典作品，仅供学习与研究 ·
+    <a href="/api/stats" target="_blank" rel="noopener">服务统计</a> ·
+    <a href="/api/works?limit=5" target="_blank" rel="noopener">示例接口</a>
+  </div>
+  <div style="margin-top:8px">欢迎通过 Pull Request 补充篇目或订正文本。</div>
+</footer>
+
+<dialog id="detail">
+  <div class="d-body">
+    <div class="d-top">
+      <div>
+        <h2 id="d-title"></h2>
+        <div class="d-a" id="d-author"></div>
+      </div>
+      <button class="d-close" id="d-close" aria-label="关闭">×</button>
+    </div>
+    <div class="poem" id="d-poem"></div>
+    <div class="note" id="d-note"></div>
+    <div class="d-meta" id="d-meta"></div>
+    <div class="d-id" id="d-id"></div>
+  </div>
+</dialog>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const state = { q: "", dynasty: "", genre: "", author: "", tag: "", sort: "relevance", page: 1, limit: 24 };
+
+function fillSelect(el, items, placeholder) {
+  el.innerHTML = `<option value="">${placeholder}</option>` +
+    items.map(i => `<option value="${i.value}">${i.value}（${i.count}）</option>`).join("");
+}
+
+async function loadFacets() {
+  const [s, f] = await Promise.all([
+    fetch("/api/stats").then(r => r.json()),
+    fetch("/api/facets").then(r => r.json())
+  ]);
+  const c = s.corpus;
+  $("stats").innerHTML = [
+    ["篇目", c.works], ["作者", c.authors], ["朝代", c.dynasties],
+    ["体裁", c.genres], ["主题标签", c.tags], ["字数", c.characters]
+  ].map(([k, v]) => `<span><b>${v}</b>${k}</span>`).join("");
+  fillSelect($("dynasty"), f.dynasties, "全部朝代");
+  fillSelect($("genre"), f.genres, "全部体裁");
+  fillSelect($("author"), f.authors, "全部作者");
+  fillSelect($("tag"), f.tags, "全部主题");
+}
+
+function query() {
+  const p = new URLSearchParams();
+  for (const k of ["q", "dynasty", "genre", "author", "tag", "sort"]) if (state[k]) p.set(k, state[k]);
+  p.set("page", state.page); p.set("limit", state.limit);
+  return p.toString();
+}
+
+function renderActive() {
+  const labels = { q: "关键词", dynasty: "朝代", genre: "体裁", author: "作者", tag: "主题" };
+  const chips = Object.keys(labels).filter(k => state[k])
+    .map(k => `<span class="chip">${labels[k]}：${state[k]}</span>`);
+  $("active").innerHTML = chips.join("");
+}
+
+async function load() {
+  $("grid").innerHTML = `<div class="empty">检索中…</div>`;
+  const data = await fetch("/api/works?" + query()).then(r => r.json());
+  renderActive();
+  $("count").textContent = data.total
+    ? `共 ${data.total} 篇 · 第 ${data.page} / ${data.pages} 页`
+    : "没有匹配的篇目";
+
+  if (!data.items.length) {
+    $("grid").innerHTML = `<div class="empty" style="grid-column:1/-1">没有找到匹配结果。<br>试试更短的关键词，或清空筛选条件。</div>`;
+    $("pager").innerHTML = "";
+    return;
+  }
+
+  $("grid").innerHTML = data.items.map(w => `
+    <button class="card" data-id="${w.id}">
+      <div class="t">${w.title}</div>
+      <div class="a">${w.dynasty} · ${w.author} · ${w.genre}</div>
+      <div class="x">${w.excerpt}…</div>
+      <div class="tg">${w.tags.map(t => `<span>${t}</span>`).join("")}</div>
+    </button>`).join("");
+
+  $("pager").innerHTML = data.pages > 1
+    ? `<button id="prev" ${data.page <= 1 ? "disabled" : ""}>上一页</button>
+       <span style="font-size:13px;color:var(--ink-2)">${data.page} / ${data.pages}</span>
+       <button id="next" ${data.page >= data.pages ? "disabled" : ""}>下一页</button>`
+    : "";
+  if ($("prev")) $("prev").onclick = () => { state.page--; load(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  if ($("next")) $("next").onclick = () => { state.page++; load(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+
+  document.querySelectorAll(".card").forEach(el => el.onclick = () => show(el.dataset.id));
+}
+
+async function show(id) {
+  const w = await fetch("/api/works/" + encodeURIComponent(id)).then(r => r.json());
+  if (w.error) return;
+  $("d-title").textContent = w.title;
+  $("d-author").textContent = `${w.dynasty} · ${w.author}`;
+  $("d-poem").innerHTML = w.content.map(l => `<div>${l}</div>`).join("");
+  $("d-note").textContent = w.note || "";
+  $("d-note").style.display = w.note ? "" : "none";
+  $("d-meta").innerHTML = [w.genre, ...(w.tags || [])].map(t => `<span>${t}</span>`).join("");
+  $("d-id").textContent = "id: " + w.id;
+  $("detail").showModal();
+}
+
+$("d-close").onclick = () => $("detail").close();
+$("detail").addEventListener("click", e => { if (e.target === $("detail")) $("detail").close(); });
+
+$("go").onclick = () => { state.q = $("q").value.trim(); state.page = 1; load(); };
+$("q").addEventListener("keydown", e => { if (e.key === "Enter") $("go").click(); });
+$("q").addEventListener("input", () => {
+  clearTimeout(window._t);
+  window._t = setTimeout(() => { state.q = $("q").value.trim(); state.page = 1; load(); }, 280);
+});
+for (const [id, key] of [["dynasty", "dynasty"], ["genre", "genre"], ["author", "author"], ["tag", "tag"], ["sort", "sort"]]) {
+  $(id).onchange = () => { state[key] = $(id).value; state.page = 1; load(); };
+}
+$("lucky").onclick = async () => {
+  const p = new URLSearchParams();
+  if (state.dynasty) p.set("dynasty", state.dynasty);
+  if (state.tag) p.set("tag", state.tag);
+  const w = await fetch("/api/random?" + p.toString()).then(r => r.json());
+  if (!w.error) show(w.id);
+};
+
+loadFacets().then(load);
+</script>
+</body>
+</html>
