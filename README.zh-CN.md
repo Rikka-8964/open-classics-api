@@ -63,7 +63,7 @@
 不用安装、不用虚拟环境、不用 requirements。Python 3.10+ 加标准库就够。
 
 ```bash
-git clone https://github.com/<your-username>/open-classics-api.git
+git clone https://github.com/Rikka-8964/open-classics-api.git
 cd open-classics-api
 python app.py
 ```
